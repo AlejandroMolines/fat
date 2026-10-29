@@ -57,7 +57,7 @@
         <div class="window-picker"><span>RANKING</span><label><input type="checkbox" name="window" value="24h" checked> 24 h</label><label><input type="checkbox" name="window" value="7d" checked> 7 días</label><label><input type="checkbox" name="window" value="30d"> 30 días</label><label><input type="checkbox" name="window" value="all"> Siempre</label></div>
         <div class="top-picker"><label for="topN">Copiar top</label><select id="topN"><option>3</option><option selected>5</option><option>10</option><option>15</option><option>20</option></select><span>inversores</span><button id="saveSettings" class="small-button">Aplicar</button></div>
       </div>
-      <div class="table-wrap"><table><thead><tr><th>#</th><th>Trader</th><th>Score</th><th>Rank 24 h</th><th>P&amp;L 24 h</th><th>Rank 7 d</th><th>Rank 30 d</th></tr></thead><tbody id="investorRows"></tbody></table></div>
+      <div class="table-wrap"><table><thead><tr><th>#</th><th>Trader</th><th>Score</th><th>Rank 24 h</th><th>P&amp;L 24 h</th><th>Rank 7 d</th><th>Rank 30 d</th><th>Detalle</th></tr></thead><tbody id="investorRows"></tbody></table></div>
       <div class="empty" id="investorsEmpty">El ranking aparecerá cuando FOMOAPI responda.</div>
     </section>
 
@@ -85,6 +85,16 @@
     <section class="panel table-panel"><div class="section-head"><div><div class="eyebrow">RESULTADO FINAL</div><h2>Operaciones cerradas</h2></div><span class="count-pill" id="closedCount">0</span></div><div class="table-wrap"><table><thead><tr><th>Activo</th><th>Trader</th><th>Apertura</th><th>Cierre</th><th>Coste</th><th>Beneficio / pérdida</th><th>Resultado</th></tr></thead><tbody id="closedBody"></tbody></table></div><div class="empty" id="closedEmpty">El resultado se calcula al cerrar una posición simulada.</div></section>
     <footer><span>Fomo Paper <i>·</i> simulador local</span><span>Datos y señales sujetos a retraso. No es asesoramiento financiero.</span></footer>
   </main>
+  <dialog id="traderDialog" class="trader-dialog" aria-labelledby="traderDialogTitle">
+    <div class="trader-dialog-head">
+      <div><div class="eyebrow">FOMO · PERFIL DEL TRADER</div><h2 id="traderDialogTitle">Últimos trades</h2><p id="traderDialogSubtitle" class="section-copy">Cargando operaciones…</p></div>
+      <button id="closeTraderDialog" class="icon-button" type="button" aria-label="Cerrar detalle">✕</button>
+    </div>
+    <div id="traderProfileActions" class="trader-profile-actions"></div>
+    <div id="traderTradesStatus" class="empty">Cargando las últimas operaciones…</div>
+    <div class="table-wrap trader-trades-wrap"><table id="traderTradesTable"><thead><tr><th>Token</th><th>Estado</th><th>Entrada</th><th>Salida</th><th>P&amp;L realizado</th><th>P&amp;L abierto</th><th>Fecha</th></tr></thead><tbody id="traderTradesBody"></tbody></table></div>
+    <p class="help-text">Datos facilitados por FOMOAPI. Puede que no estén disponibles todas las operaciones del trader. Los importes se muestran en USD y no son operaciones de tu simulador.</p>
+  </dialog>
   <div class="toast" id="toast" role="status"></div><script src="/app.js"></script>
 </body>
 </html>

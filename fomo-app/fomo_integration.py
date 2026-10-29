@@ -109,6 +109,37 @@ class FomoFeed:
         self.last_board_refresh = time.monotonic()
         return len(candidates)
 
+    def trader_positions(self, user_id, limit=10):
+        """Return the latest FOMO positions for a stable trader userId."""
+        user_id = str(user_id or "").strip()
+        if not user_id or len(user_id) > 100 or any(ch in user_id for ch in "/\\?#"):
+            raise ValueError("Identificador de trader no válido")
+        limit = max(1, min(int(limit), 25))
+        body = self._get(f"/v2/users/{user_id}/positions", {"limit": limit})
+        if not isinstance(body, dict):
+            return {"available": False, "positions": [], "message": "Respuesta de FOMOAPI no reconocida"}
+
+        rows = body.get("positions")
+        if not isinstance(rows, list):
+            rows = body.get("trades")
+        if not isinstance(rows, list):
+            data = body.get("data")
+            if isinstance(data, list):
+                rows = data
+            elif isinstance(data, dict):
+                rows = data.get("positions", data.get("trades", []))
+        if not isinstance(rows, list):
+            rows = []
+
+        return {
+            "available": body.get("available", bool(rows)),
+            "positions": rows[:limit],
+            "message": body.get("message"),
+            "source": body.get("source"),
+            "capturedAt": body.get("capturedAt") or body.get("captured_at"),
+            "complete": body.get("complete", False),
+        }
+
     @staticmethod
     def _events(body):
         if isinstance(body, list):

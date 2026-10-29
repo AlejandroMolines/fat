@@ -4,7 +4,7 @@ from datetime import datetime, timedelta, timezone
 from decimal import Decimal, InvalidOperation
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
-from urllib.parse import urlparse
+from urllib.parse import parse_qs, urlparse
 from urllib.request import urlopen
 
 APP = Path(__file__).resolve().parent
@@ -100,6 +100,20 @@ class Handler(BaseHTTPRequestHandler):
         if p=='/api/state':
             with LOCK: self.reply(state())
         elif p=='/api/health': self.reply({'ok':True,'mode':'paper','feed_connected':fomo_feed.state['connected']})
+        elif p=='/api/fomo/trader':
+            params=parse_qs(urlparse(self.path).query)
+            user_id=(params.get('user_id') or [''])[0].strip()
+            if not user_id:
+                self.reply({'ok':False,'error':{'detail':'Falta el identificador del trader'}},400)
+                return
+            if not fomo_feed.key:
+                self.reply({'ok':False,'error':{'detail':'Configura FOMOAPI_KEY en las variables de entorno'}},503)
+                return
+            try:
+                result=fomo_feed.trader_positions(user_id,10)
+                self.reply({'ok':True,'trader':result})
+            except (ValueError,RuntimeError) as exc:
+                self.reply({'ok':False,'error':{'detail':str(exc)}},502)
         elif p in ('/','/index.html'): self.static('index.html','text/html; charset=utf-8')
         elif p=='/app.js': self.static('app.js','text/javascript; charset=utf-8')
         elif p=='/styles.css': self.static('styles.css','text/css; charset=utf-8')
