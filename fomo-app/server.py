@@ -89,7 +89,43 @@ class Handler(BaseHTTPRequestHandler):
     def log_message(self,fmt,*args): print('[%s] %s'%(self.log_date_time_string(),fmt%args))
     def reply(self,obj,status=200,ctype='application/json; charset=utf-8'):
         b=json.dumps(obj,ensure_ascii=False).encode() if ctype.startswith('application/json') else obj
-        self.send_response(status); self.send_header('Content-Type',ctype); self.send_header('Content-Length',str(len(b))); self.send_header('Cache-Control','no-store'); self.end_headers(); self.wfile.write(b)
+        self.send_response(status)
+        self.send_header('Content-Type',ctype)
+        self.send_header('Content-Length',str(len(b)))
+        self.send_header('Cache-Control','no-store')
+        self.end_headers()
+        # HEAD debe devolver las cabeceras de GET, pero nunca el cuerpo.
+        if not getattr(self, '_head_only', False):
+            self.wfile.write(b)
+
+    def do_HEAD(self):
+        # Reutiliza exactamente el enrutamiento GET sin enviar el cuerpo.
+        self._head_only = True
+        try:
+            self.do_GET()
+        finally:
+            self._head_only = False
+
+    def send_error(self, code, message=None, explain=None):
+        # También evita un cuerpo en errores (por ejemplo, rutas inexistentes) con HEAD.
+        if not getattr(self, '_head_only', False):
+            return super().send_error(code, message, explain)
+        short, long = self.responses.get(code, ('???', '???'))
+        if message is None:
+            message = short
+        if explain is None:
+            explain = long
+        body = (self.error_message_format % {
+            'code': code,
+            'message': message,
+            'explain': explain,
+        }).encode('UTF-8', 'replace')
+        self.log_error('code %d, message %s', code, message)
+        self.send_response(code, message)
+        self.send_header('Connection', 'close')
+        self.send_header('Content-Type', self.error_content_type)
+        self.send_header('Content-Length', str(len(body)))
+        self.end_headers()
     def body(self):
         n=int(self.headers.get('Content-Length','0'))
         if not 0<n<100_000: raise ValueError('Solicitud vacía o demasiado grande')
@@ -207,4 +243,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
