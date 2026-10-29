@@ -173,11 +173,24 @@ class Handler(BaseHTTPRequestHandler):
         except (ValueError,KeyError,TypeError,EngineError) as e: self.reply({'ok':False,'error':{'code':getattr(e,'code','INVALID_REQUEST'),'detail':getattr(e,'detail',str(e))}},400)
         except Exception as e: print('Error interno:',repr(e)); self.reply({'ok':False,'error':{'code':'INTERNAL_ERROR','detail':'Error interno del servidor'}},500)
 
+
 def main():
-    host='127.0.0.1'; port=int(sys.argv[1]) if len(sys.argv)>1 else 8765
+    host = "0.0.0.0"
+    port = int(os.environ.get("PORT", sys.argv[1] if len(sys.argv) > 1 else "8765"))
+
     fomo_feed.start()
-    server=ThreadingHTTPServer((host,port),Handler); print(f'Fomo Paper: http://{host}:{port}'); print('Paper trading local; las señales FOMO se copian solo a la cuenta virtual.')
-    try: server.serve_forever()
-    except KeyboardInterrupt: print('\nServidor detenido')
-    finally: server.server_close()
-if __name__=='__main__': main()
+    server = ThreadingHTTPServer((host, port), Handler)
+    print(f"Fomo Paper escuchando en {host}:{port}")
+    print("Paper trading; las señales FOMO se copian solo a la cuenta virtual.")
+
+    try:
+        server.serve_forever()
+    except KeyboardInterrupt:
+        print("\nServidor detenido")
+    finally:
+        server.server_close()
+
+
+if __name__ == "__main__":
+    main()
+
