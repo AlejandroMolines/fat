@@ -1,0 +1,90 @@
+<!doctype html>
+<html lang="es">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#08090b"><title>Fomo Paper — Copia virtual</title>
+  <link rel="stylesheet" href="/styles.css">
+</head>
+<body>
+  <aside class="sidebar">
+    <a class="brand" href="#overview"><span class="brand-mark">f</span><span>fomo<span class="brand-light">paper</span></span></a>
+    <div class="mode"><i></i> SIMULADOR VIRTUAL</div>
+    <div class="nav-label">WORKSPACE</div>
+    <nav>
+      <a class="active" href="#overview"><span>◫</span>Resumen</a>
+      <a href="#chart"><span>⌁</span>Rendimiento</a>
+      <a href="#investors"><span>♙</span>Inversores</a>
+      <a href="#positions"><span>▤</span>Posiciones</a>
+      <a href="#history"><span>↗</span>Operaciones</a>
+    </nav>
+    <div class="sidebar-bottom">
+      <div class="connection"><i id="connectionDot"></i><div><b>FOMOAPI</b><small id="feedStatus">Conectando…</small></div></div>
+      <p>Solo simula. No conecta wallets ni envía órdenes reales.</p>
+    </div>
+  </aside>
+
+  <main>
+    <header>
+      <div><div class="eyebrow">TRADING SOCIAL <span>/</span> PAPER</div><h1>Tu cartera, en tiempo real.</h1><p class="subhead">Sigue las operaciones de traders destacados con 100 € virtuales.</p></div>
+      <div class="head-actions"><span class="live-pill"><i></i> <b id="fomoStatus">Esperando conexión</b></span><button id="refreshFomo" class="icon-button" title="Actualizar ranking">⟳ <span>Actualizar</span></button><button id="resetBtn" class="subtle-button">Reiniciar</button></div>
+    </header>
+
+    <div class="notice"><span class="notice-icon">i</span><span><b>Modo práctica.</b> Las cifras son simuladas desde el precio recibido y las señales de FOMOAPI pueden tener retraso u omisiones.</span><span class="paper-tag">100 € VIRTUALES</span></div>
+
+    <section id="overview" class="overview">
+      <div class="section-head"><div><div class="eyebrow">VISTA GENERAL</div><h2>Balance de la cuenta</h2></div><span id="updatedAt" class="muted">Actualizando…</span></div>
+      <div class="metrics">
+        <article class="metric primary-metric"><div class="metric-label">Patrimonio total <span>↗</span></div><strong id="equity">—</strong><small>Efectivo + posiciones actuales</small></article>
+        <article class="metric"><div class="metric-label">Beneficio neto</div><strong id="netPnl">—</strong><small>Desde los 100 € iniciales</small></article>
+        <article class="metric"><div class="metric-label">Efectivo disponible</div><strong id="cash">—</strong><small>Capital libre para copiar</small></article>
+        <article class="metric"><div class="metric-label">Tasa de acierto</div><strong id="winRate">—</strong><small><span id="closedTrades">0</span> operaciones cerradas</small></article>
+      </div>
+      <div class="stats-row"><span>Posiciones abiertas <b id="openCount">0</b></span><span>Señales recibidas <b id="signalCount">0</b></span><span>P&amp;L realizado <b id="realized">—</b></span><span>Ledger <code id="digest">—</code></span></div>
+    </section>
+
+    <section id="chart" class="panel chart-panel">
+      <div class="section-head"><div><div class="eyebrow">EVOLUCIÓN DEL CAPITAL</div><h2>Tu rendimiento</h2></div><div class="chart-key"><i></i> Patrimonio virtual <span id="chartChange">—</span></div></div>
+      <div class="chart-total"><strong id="chartEquity">—</strong><span id="chartDescription">Aún no hay operaciones registradas</span></div>
+      <div class="chart-tabs" aria-label="Periodo de gráfica"><button class="selected" data-range="all">Todo</button><button data-range="30d">30 d</button><button data-range="7d">7 d</button><button data-range="24h">24 h</button></div>
+      <div id="chartCanvas" class="chart-canvas" role="img" aria-label="Gráfica de evolución del patrimonio virtual"></div>
+      <div class="chart-axis"><span id="chartStart">Inicio</span><span>100 € iniciales</span><span id="chartEnd">Ahora</span></div>
+    </section>
+
+    <section class="panel investor-panel" id="investors">
+      <div class="section-head"><div><div class="eyebrow">FOMO LEADERBOARD</div><h2>Traders que sigues</h2></div><button id="copyToggle" class="primary-button">Pausar copia</button></div>
+      <p class="section-copy" id="fomoDetail">Copia virtual de los mejores inversores según el ranking seleccionado.</p>
+      <div class="settings-bar">
+        <div class="window-picker"><span>RANKING</span><label><input type="checkbox" name="window" value="24h" checked> 24 h</label><label><input type="checkbox" name="window" value="7d" checked> 7 días</label><label><input type="checkbox" name="window" value="30d"> 30 días</label><label><input type="checkbox" name="window" value="all"> Siempre</label></div>
+        <div class="top-picker"><label for="topN">Copiar top</label><select id="topN"><option>3</option><option selected>5</option><option>10</option><option>15</option><option>20</option></select><span>inversores</span><button id="saveSettings" class="small-button">Aplicar</button></div>
+      </div>
+      <div class="table-wrap"><table><thead><tr><th>#</th><th>Trader</th><th>Score</th><th>Rank 24 h</th><th>P&amp;L 24 h</th><th>Rank 7 d</th><th>Rank 30 d</th></tr></thead><tbody id="investorRows"></tbody></table></div>
+      <div class="empty" id="investorsEmpty">El ranking aparecerá cuando FOMOAPI responda.</div>
+    </section>
+
+    <section class="two-col">
+      <section class="panel settings-panel">
+        <div class="section-head"><div><div class="eyebrow">GESTIÓN DE RIESGO</div><h2>Reglas de simulación</h2></div><span class="paper-tag">PAPER</span></div>
+        <div class="rules"><div><span>Capital inicial</span><b>100,00 €</b></div><div><span>Asignación por compra</span><b id="allocation">10 %</b></div><div><span>Comisión</span><b id="commission">0,10 %</b></div><div><span>Slippage estimado</span><b id="slippage">10 bps</b></div><div><span>Retraso máximo</span><b id="maxDelay">30 min</b></div></div>
+        <p class="help-text">Una venta cierra las posiciones virtuales de ese trader y activo. Si la señal llega tarde o no tiene precio, queda registrada sin ejecutarse.</p>
+      </section>
+      <section class="panel manual-panel" id="manual">
+        <div class="section-head"><div><div class="eyebrow">PRUEBA MANUAL</div><h2>Simular una señal</h2></div><button id="demoBtn" class="text-button">Cargar ejemplo</button></div>
+        <form id="signalForm">
+          <label>Trader<input name="investor_id" placeholder="@trader" required maxlength="80"></label><label>Activo<input name="asset" placeholder="BTC-EUR" required maxlength="24"></label>
+          <label>Operación<select name="direction"><option value="BUY">Comprar</option><option value="SELL">Vender</option></select></label><label>Precio observable (€)<input name="price" type="number" min="0.000001" step="any" placeholder="12,50" required></label>
+          <label>Hora de la señal<input name="original_at" type="datetime-local" required></label><label>Fuente<input name="source" value="entrada manual" required maxlength="120"></label>
+          <div class="form-foot"><small>Solo cuenta virtual · EUR</small><button class="primary-button">Simular operación <span>→</span></button></div>
+        </form>
+      </section>
+    </section>
+
+    <section class="panel table-panel" id="positions"><div class="section-head"><div><div class="eyebrow">EXPOSICIÓN ACTUAL</div><h2>Posiciones abiertas</h2></div><span class="count-pill" id="positionsCount">0</span></div><div class="table-wrap"><table><thead><tr><th>Activo</th><th>Trader</th><th>Cantidad</th><th>Coste</th><th>Precio</th><th>Valor actual</th><th>P&amp;L</th><th></th></tr></thead><tbody id="positionsBody"></tbody></table></div><div class="empty" id="positionsEmpty">Todavía no hay posiciones abiertas.</div></section>
+
+    <section class="panel table-panel" id="history"><div class="section-head"><div><div class="eyebrow">ACTIVIDAD</div><h2>Historial de señales</h2></div><span class="count-pill" id="historyCount">0</span></div><div class="table-wrap"><table><thead><tr><th>Activo / señal</th><th>Trader</th><th>Dirección</th><th>Detectada</th><th>Retraso</th><th>Precio simulado</th><th>Estado</th></tr></thead><tbody id="signalsBody"></tbody></table></div><div class="empty" id="signalsEmpty">Las señales aparecerán aquí.</div></section>
+
+    <section class="panel table-panel"><div class="section-head"><div><div class="eyebrow">RESULTADO FINAL</div><h2>Operaciones cerradas</h2></div><span class="count-pill" id="closedCount">0</span></div><div class="table-wrap"><table><thead><tr><th>Activo</th><th>Trader</th><th>Apertura</th><th>Cierre</th><th>Coste</th><th>Beneficio / pérdida</th><th>Resultado</th></tr></thead><tbody id="closedBody"></tbody></table></div><div class="empty" id="closedEmpty">El resultado se calcula al cerrar una posición simulada.</div></section>
+    <footer><span>Fomo Paper <i>·</i> simulador local</span><span>Datos y señales sujetos a retraso. No es asesoramiento financiero.</span></footer>
+  </main>
+  <div class="toast" id="toast" role="status"></div><script src="/app.js"></script>
+</body>
+</html>

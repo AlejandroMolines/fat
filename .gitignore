@@ -1,0 +1,7 @@
+**/data/fomo.env
+**/data/account.json
+**/data/quotes.json
+**/data/fomo_cursor.json
+**/data/fomo_settings.json
+**/__pycache__/
+*.pyc
