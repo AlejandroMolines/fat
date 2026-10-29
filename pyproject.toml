@@ -1,3 +1,4 @@
 
 [tool.vercel]
-entrypoint = "fomo-app.server:Handler"
+entrypoint = "server:Handler"
+
